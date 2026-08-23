@@ -1,84 +1,155 @@
 ---
-import { type CollectionEntry, getCollection } from "astro:content";
-import PostPreview from "@/components/blog/PostPreview.astro";
-import Note from "@/components/note/Note.astro";
-import SocialList from "@/components/SocialList.astro";
-import { getAllPosts } from "@/data/post";
-import PageLayout from "@/layouts/Base.astro";
-import { collectionDateSort } from "@/utils/date";
+import BlogLayout from "../layouts/BlogLayout.astro";
+import { getCollection } from "astro:content";
 
-// Posts
-const MAX_POSTS = 10;
-const allPosts = await getAllPosts();
-const allPostsByDate = allPosts.sort(collectionDateSort) as CollectionEntry<"post">[];
-const latestPosts = allPostsByDate.slice(0, MAX_POSTS);
-
-// Pinned Posts, set to a max of 3;
-const MAX_PINNED_POSTS = 3;
-const pinnedPosts = allPostsByDate
-	.values()
-	.filter((p) => p.data.pinned)
-	.take(MAX_PINNED_POSTS)
-	.toArray();
-
-// Notes, set to a max of 5
-const MAX_NOTES = 5;
-const allNotes = await getCollection("note");
-const latestNotes = allNotes
-	.sort(collectionDateSort)
-	.slice(0, MAX_NOTES) as CollectionEntry<"note">[];
+const posts = (await getCollection("post"))
+	.filter((p) => !p.data.draft)
+	.sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
 ---
 
-<PageLayout meta={{ title: "Home" }}>
-	<section>
-		<h1 class="title mb-12">Hello World!</h1>
-		<p class="mb-4">
-			Hi, I’m a theme for Astro, a simple starter that you can use to create your website or blog.
-			If you want to know more about how you can customise me, add more posts, and make it your own,
-			click on the GitHub icon link below and it will take you to my repo.
+<BlogLayout title="研习手记 — LAOBAI.LOG">
+	<!-- 顶部导航 -->
+	<header
+		class="flex items-center justify-between border-b border-zinc-800/60 pb-6 backdrop-blur-sm"
+	>
+		<a
+			href="/"
+			class="group flex items-center gap-2 font-mono text-sm font-semibold tracking-wider text-zinc-100 uppercase"
+		>
+			<span
+				class="inline-block h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]"
+			></span>
+			LAOBAI.LOG
+		</a>
+		<nav class="flex items-center gap-6 font-mono text-xs text-zinc-400">
+			<a href="#articles" class="transition-colors hover:text-zinc-100">Articles</a>
+			<button
+				id="theme-toggle"
+				aria-label="Toggle theme"
+				class="flex h-11 w-11 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900/60 text-zinc-400 transition-all hover:border-cyan-500/50 hover:text-cyan-400 sm:h-8 sm:w-8"
+			>
+				<svg
+					id="sun-icon"
+					class="hidden h-5 w-5 sm:h-4 sm:w-4"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+					></path>
+				</svg>
+				<svg
+					id="moon-icon"
+					class="hidden h-5 w-5 sm:h-4 sm:w-4"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+					></path>
+				</svg>
+			</button>
+		</nav>
+	</header>
+
+	<!-- Hero 区域 -->
+	<section class="py-14 sm:py-20">
+		<div
+			class="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/5 px-3 py-1 font-mono text-xs text-cyan-400"
+		>
+			<span class="relative flex h-2 w-2">
+				<span
+					class="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75"
+				></span>
+				<span class="relative inline-flex h-2 w-2 rounded-full bg-cyan-500"></span>
+			</span>
+			Engineering, Tools & Life Fragments
+		</div>
+
+		<h1
+			class="bg-gradient-to-b from-white via-zinc-200 to-zinc-600 bg-clip-text text-5xl font-black tracking-tighter text-transparent sm:text-7xl lg:text-8xl"
+		>
+			研习手记
+		</h1>
+		<p class="mt-6 max-w-xl text-base leading-relaxed text-zinc-300 sm:text-lg">
+			Notes on systems, tools, life, and everything in between.
+			<span class="mt-1 block text-sm text-zinc-500">
+				关于系统、工具、生活以及其间的一切记录。
+			</span>
 		</p>
-		<SocialList />
 	</section>
-	{
-		pinnedPosts.length > 0 && (
-			<section class="mt-16">
-				<h2 class="title mb-6 text-xl">Pinned Posts</h2>
-				<ul class="space-y-4" role="list">
-					{pinnedPosts.map((p) => (
-						<li class="grid gap-1 sm:grid-cols-[auto_1fr]">
-							<PostPreview post={p} />
-						</li>
-					))}
-				</ul>
-			</section>
-		)
-	}
-	<section class="mt-16">
-		<h2 class="title text-accent mb-6 text-xl"><a href="/posts/">Posts</a></h2>
-		<ul class="space-y-4" role="list">
-			{
-				latestPosts.map((p) => (
-					<li class="grid gap-1 sm:grid-cols-[auto_1fr]">
-						<PostPreview post={p} />
-					</li>
-				))
-			}
-		</ul>
+
+	<!-- 文章列表 -->
+	<section id="articles" class="space-y-4">
+		{
+			posts.map((post) => (
+				<article class="group relative rounded-2xl border border-zinc-800/60 bg-zinc-900/20 p-6 transition-all duration-300 hover:border-zinc-700/80 hover:bg-zinc-900/50 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.5)]">
+					<div class="flex items-center justify-between gap-4 font-mono text-xs">
+						<span
+							class={`inline-flex items-center rounded-md border px-2 py-0.5 font-medium tracking-wide uppercase ${
+								post.data.tags?.[0] === "docker" ||
+								post.data.tags?.[0] === "network" ||
+								post.data.tags?.[0] === "infra"
+									? "border-cyan-500/30 bg-cyan-950/40 text-cyan-400"
+									: "border-indigo-500/30 bg-indigo-950/40 text-indigo-400"
+							}`}
+						>
+							{post.data.tags?.[0] || "Uncategorized"}
+						</span>
+						<time class="text-zinc-500">
+							{post.data.publishDate.toLocaleDateString("zh-CN", {
+								year: "numeric",
+								month: "2-digit",
+								day: "2-digit",
+							})}
+						</time>
+					</div>
+
+					<h2 class="mt-4 text-xl font-semibold tracking-tight text-zinc-100 transition-colors group-hover:text-cyan-300 sm:text-2xl">
+						<a href={`/blog/${post.id}`} class="after:absolute after:inset-0">
+							{post.data.title}
+						</a>
+					</h2>
+
+					<p class="mt-3 text-sm leading-relaxed text-zinc-400">{post.data.description}</p>
+
+					<div class="mt-5 flex items-center font-mono text-xs text-zinc-500 transition-colors group-hover:text-zinc-300">
+						<span>Read article</span>
+						<span class="ml-2 transition-transform duration-200 group-hover:translate-x-1">→</span>
+					</div>
+				</article>
+			))
+		}
 	</section>
-	{
-		latestNotes.length > 0 && (
-			<section class="mt-16">
-				<h2 class="title text-accent mb-6 text-xl">
-					<a href="/notes/">Notes</a>
-				</h2>
-				<ul class="space-y-6" role="list">
-					{latestNotes.map((note) => (
-						<li>
-							<Note note={note} as="h3" isPreview />
-						</li>
-					))}
-				</ul>
-			</section>
-		)
-	}
-</PageLayout>
+
+	<!-- Footer -->
+	<footer
+		class="mt-20 flex flex-col items-center justify-between gap-4 border-t border-zinc-800/60 pt-8 font-mono text-xs text-zinc-500 sm:flex-row"
+	>
+		<div class="flex items-center gap-2">
+			<span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+			<span>© 2025-2026 老白 · 研习手记</span>
+		</div>
+		<div class="flex items-center gap-6">
+			<a href="/rss.xml" class="transition-colors hover:text-zinc-300">RSS</a>
+			<a href="mailto:your-email@example.com" class="transition-colors hover:text-zinc-300">Email</a
+			>
+			<a
+				href="https://beian.miit.gov.cn/"
+				target="_blank"
+				rel="noreferrer"
+				class="transition-colors hover:text-zinc-300"
+			>
+				浙 ICP 备 2025206750 号 -1
+			</a>
+		</div>
+	</footer>
+</BlogLayout>

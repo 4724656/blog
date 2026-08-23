@@ -1,0 +1,95 @@
+---
+import "../styles/global.css";
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN" class="scroll-smooth">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{title} — 研习手记</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<script is:inline>
+			const getThemePreference = () => {
+				if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
+					return localStorage.getItem("theme");
+				}
+				return "dark";
+			};
+			const p = getThemePreference();
+			if (p === "light") {
+				document.documentElement.classList.add("light");
+				document.documentElement.setAttribute("data-theme", "light");
+			} else {
+				document.documentElement.classList.remove("light");
+				document.documentElement.setAttribute("data-theme", "dark");
+			}
+		</script>
+	</head>
+	<body
+		class="relative min-h-screen bg-[#09090b] text-zinc-300 antialiased selection:bg-cyan-500/30 selection:text-cyan-200"
+	>
+		<!-- 1. 背景点阵网格 -->
+		<div
+			class="bg-grid-pattern pointer-events-none fixed inset-0 -z-20 [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] [background-size:24px_24px] opacity-60"
+		>
+		</div>
+
+		<!-- 2. 双色微光晕环境光 -->
+		<div
+			class="pointer-events-none fixed top-0 left-1/2 -z-10 h-[320px] w-[600px] -translate-x-1/2 rounded-full bg-gradient-to-tr from-cyan-500/10 via-indigo-500/10 to-transparent blur-[100px]"
+		>
+		</div>
+
+		<div class="mx-auto max-w-4xl px-6 py-10 sm:py-16">
+			<slot />
+		</div>
+
+		<script is:inline>
+			window.addEventListener("DOMContentLoaded", () => {
+				const themeToggle = document.getElementById("theme-toggle");
+				const sunIcon = document.getElementById("sun-icon");
+				const moonIcon = document.getElementById("moon-icon");
+
+				const updateIcons = () => {
+					if (document.documentElement.classList.contains("light")) {
+						sunIcon.classList.remove("hidden");
+						moonIcon.classList.add("hidden");
+					} else {
+						moonIcon.classList.remove("hidden");
+						sunIcon.classList.add("hidden");
+					}
+				};
+
+				updateIcons();
+
+				themeToggle.addEventListener("click", () => {
+					const toggleTheme = () => {
+						document.documentElement.classList.toggle("light");
+						const isLight = document.documentElement.classList.contains("light");
+						document.documentElement.setAttribute("data-theme", isLight ? "light" : "dark");
+						localStorage.setItem("theme", isLight ? "light" : "dark");
+						updateIcons();
+					};
+
+					if (!document.startViewTransition) {
+						toggleTheme();
+					} else {
+						document.startViewTransition(() => toggleTheme());
+					}
+				});
+			});
+		</script>
+	</body>
+</html>

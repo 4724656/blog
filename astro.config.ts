@@ -21,6 +21,9 @@ import { expressiveCodeOptions, siteConfig } from "./src/site.config";
 
 // https://astro.build/config
 export default defineConfig({
+	devToolbar: {
+		enabled: false,
+	},
 	site: siteConfig.url,
 	image: {
 		domains: ["webmention.io"],
@@ -73,13 +76,13 @@ export default defineConfig({
 				satteriReadingTimePlugin(),
 				satteriGithubCardPlugin(),
 				satteriAdmonitionsPlugin(),
-			],
+			] as any[],
 			hastPlugins: [
 				satteriHeadingIdsPlugin(),
 				satteriAutolinkHeadingsPlugin(),
 				satteriFootnoteLabelPlugin(),
 				satteriExternalLinksPlugin(),
-			],
+			] as any[],
 		}),
 	},
 	vite: {
