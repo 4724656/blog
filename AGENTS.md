@@ -1,46 +1,55 @@
-## Development
+# 🤖 AI 智能体与 OpenClaw 协作规范 (AGENTS.md)
 
-When starting the dev server, use background mode:
+欢迎使用本博客项目！为了确保整个博客系统的稳定与极简排版的高品质，所有 AI Agent（包括 OpenClaw、编码助手等）在进行内容生成或开发协助时，**必须严格遵循以下规则**。
 
-```
+---
+
+## 一、 本地开发与调试指令
+
+开发服务器管理指令：
+
+```bash
+# 启动本地开发服务（后台模式）
 astro dev --background
+
+# 查看状态、日志与停止
+astro dev status
+astro dev logs
+astro dev stop
 ```
 
-Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
+---
 
-## Documentation
+## 二、 内容发布规范（供 OpenClaw 及 AI 写作使用）
 
-Full documentation: https://docs.astro.build
+为本站撰写或自动生成博客文章时，必须严格执行以下标准：
 
-Consult these guides before working on related tasks:
+### 1. 目标存放目录
+* **所有文章必须且只能创建在**：`content/posts/` 目录下。
 
-- [Adding pages, dynamic routes, or middleware](https://docs.astro.build/en/guides/routing/)
-- [Working with Astro components](https://docs.astro.build/en/basics/astro-components/)
-- [Using React, Vue, Svelte, or other framework components](https://docs.astro.build/en/guides/framework-components/)
-- [Adding or managing content](https://docs.astro.build/en/guides/content-collections/)
-- [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
-- [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
+### 2. 文件命名规范（极重要 ⚠️）
+* 文件名**必须使用全小写英文、简短拼音或日期前缀**（例如：`2026-08-25-my-post.md`、`docker-guide.md`、`laobai-thoughts.md`）。
+* **严禁在文件名中使用中文字符或空格**，以防止 URL 链接在分享时被转义为冗长难看的乱码。
 
-## Publishing Content / Writing Posts (for OpenClaw & AI Agents)
+### 3. 必须包含的头部元数据（Frontmatter）
+每篇文章的最顶部必须包含标准的 YAML 头部格式：
 
-When writing or generating blog posts for this site, strictly follow these rules:
+```yaml
+---
+title: "文章的完整中文大标题"
+description: "文章导语/摘要（50-120字左右，用于首页卡片展示和文章头部引言）"
+publishDate: "YYYY-MM-DD"
+tags: ["分类标签1", "分类标签2"]
+---
+```
 
-1. **Target Directory**: All posts MUST be created in `content/posts/`.
-2. **File Naming**:
-   - Use English kebab-case, short pinyin, or date-prefixed alphanumeric slugs (e.g. `2026-08-25-my-post.md`, `docker-guide.md`, `thoughts-01.md`).
-   - NEVER use Chinese characters or spaces in filenames to avoid messy URL percent-encoding.
-3. **Required Frontmatter Format**:
-   ```yaml
-   ---
-   title: "文章的中文完整标题"
-   description: "文章导语/摘要（50-100字），用于列表展示和文章头部引用"
-   publishDate: "YYYY-MM-DD"
-   tags: ["tag1", "tag2"]
-   ---
-   ```
-4. **Typography & Formatting**:
-   - Use `##` for section headers (h2).
-   - Use `>` for key quotes, highlights, or summaries.
-   - Use `**bold**` for strong emphasis.
-   - Keep Chinese typesetting clean with natural paragraph spacing.
-5. **No Layout Alterations**: Do NOT modify any components, layouts, or CSS in `src/`. Only create/edit `.md` files in `content/posts/`.
+### 4. 中文排版与内容格式要求
+* **章节标题**：正文内小标题一律使用二级标题 `##`。
+* **重点引言**：核心观点、摘要或金句请使用引用语法 `>`（会自动套用专属微光晕边框）。
+* **加粗强调**：核心词汇使用 `**加粗**`。
+* **代码与专有名词**：命令行参数、英文术语请使用反引号 `` `code` ``。
+* **段落呼吸感**：段落之间空一行，保持舒适的行间距。
+
+### 5. 权限边界（禁止越权修改）
+* ⚠️ **严禁修改任何底层代码**：未经明确要求，不得修改 `src/` 下的任何组件、布局或样式文件。
+* 日常发文仅限于在 `content/posts/` 下新建或编辑 `.md` 文件。
