@@ -15,12 +15,16 @@ Watchtower 能自动更新容器，但默认通知体验极差：容器重启发
 
 ## 预期通知效果
 
-> 🚀 **Docker 更新完成**
-> 🖥 服务器: 你的服务器名称
-> 📊 概览: 8 扫描 | 2 更新
-> 📦 容器列表:
-> • `watchtower` (nickfedor/watchtower:latest)
-> • `vaultwarden` (vaultwarden/server:latest)
+实际推送效果类似以下文本框：
+
+```text
+🚀 Docker 更新完成
+🖥 服务器: 你的服务器名称
+📊 概览: 8 扫描 | 2 更新
+📦 容器列表:
+• watchtower (nickfedor/watchtower:latest)
+• vaultwarden (vaultwarden/server:latest)
+```
 
 ---
 
