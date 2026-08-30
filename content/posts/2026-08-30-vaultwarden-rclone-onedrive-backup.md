@@ -1,7 +1,7 @@
 ---
 title: 用 rclone 加密备份 Docker Vaultwarden 到 OneDrive
 description: 在 Debian VPS 上为 Docker Vaultwarden 建立自动备份：生成一致性 SQLite 快照、打包关键数据、使用 rclone crypt 客户端加密并上传到 OneDrive。
-pubDate: 2026-08-30
+publishDate: 2026-08-30
 tags:
   - rclone
   - vaultwarden
