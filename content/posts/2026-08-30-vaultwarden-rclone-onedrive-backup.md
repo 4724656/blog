@@ -270,6 +270,11 @@ if ! rclone lsf "$REMOTE" | grep -Fqx "$(basename "$ARCHIVE")"; then
   exit 1
 fi
 
+# 删除远端超过 KEEP_DAYS 天的 vaultwarden-*.tar.gz
+rclone delete "$REMOTE" \
+  --include 'vaultwarden-*.tar.gz' \
+  --min-age "${KEEP_DAYS}d"
+
 find "$LOCAL_DIR" -maxdepth 1 -type f -name 'vaultwarden-*.tar.gz' \
   -mtime +"$KEEP_DAYS" -print -delete
 
