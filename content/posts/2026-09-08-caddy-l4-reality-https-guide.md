@@ -144,7 +144,9 @@ networks:
 }
 ```
 
-![Caddy-L4 Reality SNI 分流与自动 HTTPS 架构示意图](https://image.xmlys.de/file/1788954711721_2942F2CE-D476-4BD1-9C41-6D1C665FE592.png)
+<p align="center">
+  <img src="https://image.xmlys.de/file/1788954711721_2942F2CE-D476-4BD1-9C41-6D1C665FE592.png" alt="Caddy-L4 Reality SNI 分流与自动 HTTPS 架构示意图" style="display:block;width:100%;max-width:900px;height:auto;margin:1.5rem auto;border-radius:8px;" />
+</p>
 
 ### 配置要点
 
