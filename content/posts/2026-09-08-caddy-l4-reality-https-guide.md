@@ -144,6 +144,8 @@ networks:
 }
 ```
 
+![Caddy-L4 Reality SNI 分流与自动 HTTPS 架构示意图](https://image.xmlys.de/file/1788954711721_2942F2CE-D476-4BD1-9C41-6D1C665FE592.png)
+
 ### 配置要点
 
 - `storage file_system { root /data }` 是 Caddy 的证书/ACME 数据存储路径，不是静态网站目录。
