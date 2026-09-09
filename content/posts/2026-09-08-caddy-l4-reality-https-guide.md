@@ -5,8 +5,6 @@ publishDate: "2026-09-08"
 tags: ["Caddy", "Reality", "sing-box", "Docker", "HTTPS", "VPS"]
 ---
 
-# Caddy-L4：Reality SNI 分流部署指南
-
 ## 目标
 
 在一台 VPS 上只使用公网 `443` 作为统一入口：
@@ -108,7 +106,7 @@ networks:
 - `443/tcp` 用于 Reality、HTTPS、HTTP/2。
 - `443/udp` 用于 HTTP/3/QUIC；开启 HTTP/3 时必须存在。
 - `/data` 必须持久化；它保存证书、私钥、ACME 账户、OCSP 和锁文件。
-- Caddyfile 保持 `:ro` 是正确的。运行容器只读配置；编辑和格式化应由宿主机或临时容器完成。
+- 将 Caddyfile 以 `:ro` 只读方式挂载是正确的；编辑和格式化应在宿主机或临时容器中完成。
 
 ---
 
@@ -262,7 +260,7 @@ curl --http3-only -Iv https://<WEB_DOMAIN>
 
 关键是响应协议显示为 `HTTP/3`。若失败，依次检查 Docker 是否发布 UDP 443、VPS 防火墙、云防火墙及 DNS IPv6 路径。
 
-### Caddy storage
+### Caddy 数据存储
 
 ```bash
 docker exec caddy sh -c 'find /data -type f | sort'
@@ -275,7 +273,7 @@ docker exec caddy sh -c 'find /data -type f | sort'
 /data/certificates/
 ```
 
-Caddy 日志应显示：
+Caddy 日志中应能看到类似：
 
 ```text
 FileStorage:/data
