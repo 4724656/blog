@@ -274,6 +274,64 @@ tcpdump -ni <LAN_IF>
 tcpdump -ni tun0
 ```
 
+## 一次开机事故：WireGuard 为什么没能自动起来
+
+这套配置后来遇到过一次很典型的开机问题。机器重启后，WireGuard 没有正常恢复，客户端一度连不上。
+
+日志里最关键的几行是：
+
+```text
+wg-quick[794]: [#] iptables -I DOCKER-USER -i wg0 -j ACCEPT
+iptables: No chain/target/match by that name.
+wg-quick[794]: [#] ip link delete dev wg0
+systemd[1]: Failed to start wg-quick@wg0.service
+```
+
+问题出在启动顺序。开机时 systemd 会并发拉起多个服务，`wg-quick@wg0` 有时比 Docker 更早启动。此时 Docker 还没有创建 `DOCKER-USER` 链，WireGuard 的 `PostUp` 执行下面这条规则自然会失败：
+
+```shell
+iptables -I DOCKER-USER -i wg0 -j ACCEPT
+```
+
+`wg-quick` 对 `PostUp` 的错误处理比较严格。规则插入失败后，它会判定接口启动失败，并删除刚刚创建的 `wg0`。结果就是 WireGuard 服务停在 `failed` 状态，端口也不会监听。更麻烦的是，服务没有配置失败自动重启，后面即使 Docker 已经启动，`wg0` 也不会自己回来。
+
+这次修复分成两层。第一层是在 `PostUp` 里先确保链存在，并且用 `-C` 检查规则，避免重复插入：
+
+```ini
+PostUp = iptables -N DOCKER-USER 2>/dev/null || true; iptables -C DOCKER-USER -i wg0 -j ACCEPT 2>/dev/null || iptables -I DOCKER-USER -i wg0 -j ACCEPT; iptables -C DOCKER-USER -o wg0 -j ACCEPT 2>/dev/null || iptables -I DOCKER-USER -o wg0 -j ACCEPT; iptables -t nat -C POSTROUTING -o <LAN_IF> -j MASQUERADE 2>/dev/null || iptables -t nat -A POSTROUTING -o <LAN_IF> -j MASQUERADE
+```
+
+第二层是给 systemd 加上启动顺序和失败重启：
+
+```ini
+[Unit]
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Restart=on-failure
+RestartSec=5s
+```
+
+`After=docker.service` 让 WireGuard 尽量排在 Docker 后面启动；脚本里的“先建链”和 systemd 的自动重试则是两道保险。以后即使启动时序偶尔不理想，服务也有机会在 Docker 就绪后重新拉起。
+
+修复后检查到的状态：
+
+- `wg0` 已恢复运行，并监听配置中的 WireGuard 端口。
+- `DOCKER-USER` 的 WireGuard 放行规则和物理接口的 MASQUERADE 规则已生效。
+- `net.ipv4.ip_forward = 1` 保持开启。
+
+排查类似问题时，可以先看服务日志和接口状态：
+
+```shell
+journalctl -u wg-quick@wg0 --no-pager
+systemctl status wg-quick@wg0
+ss -lntup
+wg show
+```
+
+这次事故说明，网络配置不能只验证“手动启动能不能跑”。还要模拟一次重启，确认 Docker、WireGuard、iptables 链和自动恢复机制之间的依赖关系。
+
 ## 两条实际流量路径
 
 访问局域网时：
