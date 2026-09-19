@@ -18,7 +18,9 @@ tags: ["Debian", "sing-box", "WireGuard", "网络转发", "防火墙"]
 
 整套架构的拓扑关系与分流调度链路如下图所示：
 
-![Debian 宿主机 sing-box 与 WireGuard 网络转发拓扑](/diagrams/debian-sing-box-wireguard-gateway.svg)
+<p align="center">
+  <img src="/diagrams/debian-sing-box-wireguard-gateway.svg" alt="Debian 宿主机 sing-box 与 WireGuard 网络转发拓扑" style="display:block;width:100%;max-width:1060px;height:auto;margin:1.5rem auto;border-radius:8px;" />
+</p>
 
 这几个组件的分工非常清晰：
 - **WireGuard** 提供虚拟网卡与加密传输通道；
@@ -241,7 +243,7 @@ docker network inspect <NETWORK_NAME>
 
 规划原则：**让 TUN 虚拟网卡、WireGuard 隧道、Docker Bridge、局域网子网彼此分配完全隔离的地址段**。例如使用 `172.31.255.0/30` 能有效减少与常规 `172.17.x.x` 或 `192.168.x.x` 发生碰撞。
 
-此外，**切勿死板照抄网络教程中的网卡名**（如 `eth0`）。现代 systemd 可预测网卡命名机制下，物理网卡常命名为 `ens18`、`enp6s18` 或 `eno1`，必须现场通过命令行确定真实出口：
+此外，**切勿死板照抄网络教程中的网卡名**（如 `eth0`）。现代 systemd 可预测网卡命名机制下，物理网卡常命名为 `<LAN_IF>`、`enp6s18` 或 `eno1`，必须现场通过命令行确定真实出口：
 
 ```bash
 ip -br link
